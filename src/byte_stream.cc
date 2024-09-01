@@ -15,7 +15,6 @@ bool Writer::is_closed() const
 void Writer::push( string data )
 {
   // Your code here.
-  (void)data;
   size_t bytes_to_copy = min( data.size(), available_capacity() );
   buffer_ += data.substr( 0, bytes_to_copy );
   bytes_pushed_ += bytes_to_copy;

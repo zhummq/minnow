@@ -1,12 +1,12 @@
 #pragma once
 
 #include "byte_stream.hh"
-
+#include <set>
 class Reassembler
 {
 public:
   // Construct Reassembler to write into given ByteStream.
-  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) ) {}
+  explicit Reassembler( ByteStream&& output ) : output_( std::move( output ) )  {}
 
   /*
    * Insert a new substring to be reassembled into a ByteStream.
@@ -39,7 +39,23 @@ public:
 
   // Access output stream writer, but const-only (can't write from outside)
   const Writer& writer() const { return output_.writer(); }
+  void check_push();
 
 private:
-  ByteStream output_; // the Reassembler writes to this ByteStream
+
+  ByteStream output_; // the Reassembler writes to this ByteStreamuint
+  struct Seg {
+    uint64_t first_index;
+    std::string data;
+    bool operator<(const Seg& other) const {
+      return first_index < other.first_index;
+  }
+  Seg(uint64_t f, std::string d) : first_index(f), data(d) {};
+
+  };
+  std::set<Seg> segments_ {};
+  uint64_t first_unpoped_index_ {};
+  uint64_t first_unassembled_index_ {};
+  uint64_t bytes_pending_ {};
+  uint64_t final_index_ = INT64_MAX;
 };
